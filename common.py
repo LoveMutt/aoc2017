@@ -2,8 +2,8 @@ import logging
 
 
 
-def get_logger(name):
-	logging.basicConfig(level=logging.DEBUG)
+def get_logger(name, level='DEBUG'):
+	logging.basicConfig(level=logging.__getattribute__(level))
 	return logging.getLogger(name)
 
 
