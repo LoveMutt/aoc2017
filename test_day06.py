@@ -17,3 +17,10 @@ class TestDay(unittest.TestCase):
         d = Distributor(banks=get_test_input())
         d.seek_next_index()
         self.assertEqual(d.index, 2)
+
+    def test_proc(self):
+        d = Distributor(banks=get_test_input())
+        d.proc()
+        self.assertIn(d.banks, d.memory)
+        log.debug('Found repeating sequence: {}'.format(d.banks))
+        self.assertEqual(d.steps, 5)
