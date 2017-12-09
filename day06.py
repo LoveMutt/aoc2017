@@ -57,7 +57,7 @@ def main():
     d = Distributor(banks=banks)
     d.proc()
 
-    answer_1 = 'Unknown'
+    answer_1 = d.steps
     print('The answer to part 1 is: {}'.format(answer_1))
     answer_2 = 'Unknown'
     print('The answer to part 2 is: {}'.format(answer_2))
