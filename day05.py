@@ -37,5 +37,5 @@ def main():
 
 
 if __name__ == '__main__':
-    log = common.get_logger('day04', level='INFO')
+    log = common.get_logger('day05', level='INFO')
     main()
