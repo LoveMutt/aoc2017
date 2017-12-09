@@ -12,6 +12,7 @@ class Distributor:
         self.banks = banks
         self.index = 0
         self.memory = []
+        self.steps = 0
 
     def seek_next_index(self):
         maxval = max(self.banks)
@@ -26,14 +27,20 @@ class Distributor:
 
     def proc(self):
         while self.banks not in self.memory:
+            self.memory.append(self.banks.copy())
+            self.steps += 1
+            log.debug('Step {:04}'.format(self.steps))
             self.seek_next_index()
             boxes = self.banks[self.index]
+            log.debug('Storing value {} for distribution'.format(boxes))
+            log.debug('Clearing index {}'.format(self.index))
+            log.debug('Banks before distribution: {}'.format(self.banks))
             self.banks[self.index] = 0
             while boxes:
                 self.index = (self.index + 1) % len(self.banks)
                 self.banks[self.index] += 1
                 boxes -= 1
-            self.memory.append(self.banks.copy)
+            log.debug('Banks after distribution: {}'.format(self.banks))
 
 
 def init_banks():
