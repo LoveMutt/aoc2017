@@ -21,6 +21,6 @@ class TestDay(unittest.TestCase):
     def test_proc(self):
         d = Distributor(banks=get_test_input())
         d.proc()
-        self.assertIn(d.banks, d.memory)
         log.debug('Found repeating sequence: {}'.format(d.banks))
-        self.assertEqual(d.steps, 5)
+        self.assertEqual(d.registers[0], 5)
+        self.assertEqual(d.registers[1], 4 + 5)

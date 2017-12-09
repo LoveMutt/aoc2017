@@ -13,6 +13,8 @@ class Distributor:
         self.index = 0
         self.memory = []
         self.steps = 0
+        self.occurences = 0
+        self.registers = []
 
     def seek_next_index(self):
         maxval = max(self.banks)
@@ -26,21 +28,25 @@ class Distributor:
         log.debug('Choosing index {} with value {}'.format(self.index, self.banks[self.index]))
 
     def proc(self):
-        while self.banks not in self.memory:
-            self.memory.append(self.banks.copy())
-            self.steps += 1
-            log.debug('Step {:04}'.format(self.steps))
-            self.seek_next_index()
-            boxes = self.banks[self.index]
-            log.debug('Storing value {} for distribution'.format(boxes))
-            log.debug('Clearing index {}'.format(self.index))
-            log.debug('Banks before distribution: {}'.format(self.banks))
-            self.banks[self.index] = 0
-            while boxes:
-                self.index = (self.index + 1) % len(self.banks)
-                self.banks[self.index] += 1
-                boxes -= 1
-            log.debug('Banks after distribution: {}'.format(self.banks))
+        while len(self.registers) < 2:
+            while self.banks not in self.memory:
+                self.memory.append(self.banks.copy())
+                self.steps += 1
+                log.debug('Step {:04}'.format(self.steps))
+                self.seek_next_index()
+                boxes = self.banks[self.index]
+                log.debug('Storing value {} for distribution'.format(boxes))
+                log.debug('Clearing index {}'.format(self.index))
+                log.debug('Banks before distribution: {}'.format(self.banks))
+                self.banks[self.index] = 0
+                while boxes:
+                    self.index = (self.index + 1) % len(self.banks)
+                    self.banks[self.index] += 1
+                    boxes -= 1
+                log.debug('Banks after distribution: {}'.format(self.banks))
+            self.registers.append(self.steps)
+            log.debug('Registering {} at step {}'.format(self.banks, self.steps))
+            self.memory = []  # clear memory to build again
 
 
 def init_banks():
@@ -57,9 +63,9 @@ def main():
     d = Distributor(banks=banks)
     d.proc()
 
-    answer_1 = d.steps
+    answer_1 = d.registers[0]
     print('The answer to part 1 is: {}'.format(answer_1))
-    answer_2 = 'Unknown'
+    answer_2 = d.registers[1] - d.registers[0]
     print('The answer to part 2 is: {}'.format(answer_2))
 
 
