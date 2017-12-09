@@ -30,8 +30,8 @@ def main():
     jmps = parse_input(common.read_input(5))
     js = JmpSet(jmps=jmps)
     js.proc()
-    answer_1 = 0
-    answer_2 = 0
+    answer_1 = js.steps
+    answer_2 = 'Not Known'
     print('The answer to part 1 is: {}'.format(answer_1))
     print('The answer to part 2 is: {}'.format(answer_2))
 
