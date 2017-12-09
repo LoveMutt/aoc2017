@@ -52,7 +52,7 @@ def evenly_divisible(a, b):
 
 
 def main():
-	inlist = parse_input(common.read_input(02))
+	inlist = parse_input(common.read_input(2))
 	print('The answer to part 1 is: {}'.format(checksum(inlist)))
 	print('The answer to part 2 is: {}'.format(checksum_part2(inlist)))
 

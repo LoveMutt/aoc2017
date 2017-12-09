@@ -26,7 +26,7 @@ def sum_matches_part2(L):
 
 
 def main():
-	input = common.read_input(01)
+	input = common.read_input(1)
 	input_array = [int(c) for c in input]
 	answer = sum_matches(input_array)
 	answer2 = sum_matches_part2(input_array)
