@@ -11,3 +11,14 @@ class TestDay(unittest.TestCase):
         self.assertFalse(has_duplicates('aa bb cc dd ee'))
         self.assertTrue(has_duplicates('aa bb cc dd aa'))
         self.assertFalse(has_duplicates('aa bb cc dd aaa'))
+
+    def test_is_anagram(self):
+        tuples = [
+            ('a', 'a', True),
+            ('ab', 'a', False),
+            ('ab', 'ba', True),
+            ('abcdefgh', 'cdabfgeh', True),
+        ]
+
+        for s1, s2, b in tuples:
+            self.assertEqual(is_anagram(s1, s2), b)

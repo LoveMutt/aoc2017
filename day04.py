@@ -14,6 +14,19 @@ def has_duplicates(s, delim=' '):
         tokens = tail
     return False
 
+
+def is_anagram(s1, s2):
+    l1 = list(s1)
+    l1 = sorted(l1)
+    l2 = list(s2)
+    l2 = sorted(l2)
+    return l1 == l2
+
+
+def has_anagrams(s):
+    tokens = s.split(' ')
+
+
 def is_valid(s):
     # type: (str) -> bool
     if not s:
