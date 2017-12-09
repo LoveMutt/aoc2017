@@ -22,3 +22,15 @@ class TestDay(unittest.TestCase):
 
         for s1, s2, b in tuples:
             self.assertEqual(is_anagram(s1, s2), b)
+
+    def test_has_anagrams(self):
+        tuples = [
+            ('abcde fghij', False),
+            ('abcde xyz ecdab', True),
+            ('a ab abc abd abf abj', False),
+            ('iiii oiii ooii oooi oooo', False),
+            ('oiii ioii iioi iiio', True),
+        ]
+
+        for s, b in tuples:
+            self.assertEqual(has_anagrams(s), b)
