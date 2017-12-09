@@ -23,11 +23,11 @@ class JmpSet:
 
 
 def parse_input(intext):
-    return intext.split('\n')
+    return [int(c) for c in intext.split('\n') if c]
 
 
 def main():
-    jmps = parse_input(common.read_input(4))
+    jmps = parse_input(common.read_input(5))
     js = JmpSet(jmps=jmps)
     js.proc()
     answer_1 = 0
