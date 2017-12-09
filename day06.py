@@ -7,21 +7,49 @@ log = common.get_logger(__name__)
 Bank = namedtuple('Bank', 'blocks')
 
 
-def set_banks(inlist):
-    # type: (list) -> list
-    pass
+class Distributor:
+    def __init__(self, banks):
+        self.banks = banks
+        self.index = 0
+        self.memory = []
+
+    def seek_next_index(self):
+        maxval = max(self.banks)
+        log.debug('Max value in banks is: {}'.format(maxval))
+        indexes = []
+        for i in range(len(self.banks)):
+            if self.banks[i] == maxval:
+                indexes.append(i)
+        log.debug('Max value was found at indexes: {}'.format(indexes))
+        self.index = min(indexes)
+        log.debug('Choosing index {} with value {}'.format(self.index, self.banks[self.index]))
+
+    def proc(self):
+        while self.banks not in self.memory:
+            self.seek_next_index()
+            boxes = self.banks[self.index]
+            self.banks[self.index] = 0
+            while boxes:
+                self.index = (self.index + 1) % len(self.banks)
+                self.banks[self.index] += 1
+                boxes -= 1
+            self.memory.append(self.banks.copy)
 
 
-def distrib(banks):
-    # type: (list[Bank]) -> None
-    for b in banks:
-        pass
+def init_banks():
+    # type: () -> list
+    return parse_input(common.read_input(6))
+
 
 def parse_input(intext):
-    return [int(c) for c in intext.split('\n') if c]
+    return [int(n) for n in intext.split('\t')]
 
 
 def main():
+    banks = init_banks()
+    d = Distributor(banks=banks)
+    d.proc()
+
     answer_1 = 'Unknown'
     print('The answer to part 1 is: {}'.format(answer_1))
     answer_2 = 'Unknown'
