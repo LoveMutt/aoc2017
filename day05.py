@@ -7,7 +7,7 @@ class JmpSet:
     def __init__(self, jmps):
         self.cur_idx = 0
         self.jmps = jmps
-        self.num_processed = 0
+        self.steps = 0
 
     @property
     def __len__(self):
@@ -19,6 +19,7 @@ class JmpSet:
             tmp_idx = self.cur_idx
             self.cur_idx += jmp
             self.jmps[tmp_idx] += 1
+            self.steps += 1
 
 
 def parse_input(intext):
