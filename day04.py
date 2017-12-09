@@ -14,12 +14,9 @@ def split_head(inlist):
 def has_duplicates(s, delim=' '):
     # type: (str) -> bool
     tokens = s.split(delim)
-    while len(tokens) > 0:
-        head = tokens[0]
-        tail = tokens[1:]
+    for head, tail in split_head(tokens):
         if head in tail:
             return True
-        tokens = tail
     return False
 
 
@@ -33,6 +30,11 @@ def is_anagram(s1, s2):
 
 def has_anagrams(s):
     tokens = s.split(' ')
+    for head, tail in split_head(tokens):
+        for t in tail:
+            if is_anagram(head, t):
+                return True
+    return False
 
 
 def is_valid(s):
@@ -40,6 +42,8 @@ def is_valid(s):
     if not s:
         return False
     if has_duplicates(s):
+        return False
+    if has_anagrams(s):
         return False
     return True
 
@@ -51,13 +55,17 @@ def parse_input(intext):
 def main():
     passphrases = parse_input(common.read_input(4))
     answer_1 = 0
+    answer_2 = 0
     idx = 1
     for p in passphrases:
         log.debug('Testing passphrase ({}/{})'.format(idx, len(passphrases)))
         idx += 1
         if not has_duplicates(p):
             answer_1 += 1
+        if not has_anagrams(p):
+            answer_2 += 1
     print('The answer to part 1 is: {}'.format(answer_1))
+    print('The answer to part 2 is: {}'.format(answer_2))
 
 
 if __name__ == '__main__':
