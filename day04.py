@@ -3,6 +3,14 @@ import common
 log = common.get_logger(__name__)
 
 
+def split_head(inlist):
+    while len(inlist) > 1:
+        head = inlist[0]
+        tail = inlist[1:]
+        yield head, tail
+        inlist = tail
+
+
 def has_duplicates(s, delim=' '):
     # type: (str) -> bool
     tokens = s.split(delim)
