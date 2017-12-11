@@ -16,7 +16,11 @@ class Tower:
         self.parent = parent
 
     def __repr__(self):
-        return "<Tower name='{}', weight={}, children={} />".format(self.name, self.weight, self.children)
+        return "<Tower name='{}', weight={}, children={}, parent={} />".format(self.name,
+                                                                               self.weight,
+                                                                               self.children,
+                                                                               self.parent,
+                                                                               )
 
 def parse_input(intext):
     return [line for line in intext.split('\n') if line]
@@ -55,7 +59,7 @@ def create_towers_from_input(lines):
     for line in lines:
         t = tower_from_input(line)
         towers.append(t)
-
+    towers = add_children_from_input(lines, towers)
     return towers
 
 
@@ -70,6 +74,14 @@ def add_children_from_input(lines, towers):
             t_child.parent = t_parent
             t_parent.children.append(t_child)
     return towers
+
+
+def get_base_tower(towers):
+    # type: (list[Tower]) -> Tower
+    for t in towers:  # type: Tower
+        if t.parent is None:
+            return t
+    return None
 
 
 def main():
