@@ -54,6 +54,7 @@ class TestDay(unittest.TestCase):
         for child in t_parent.children:
             self.assertIsInstance(child, Tower)
             self.assertIn(child, towers)
+            self.assertEqual(child.parent, t_parent)
 
 
     def test_create_towers_from_input(self):

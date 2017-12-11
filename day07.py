@@ -67,6 +67,7 @@ def add_children_from_input(lines, towers):
         children = [c.strip() for c in stack_info.split(',')]
         for s_child in children:
             t_child = get_tower_by_name(s_child, towers)
+            t_child.parent = t_parent
             t_parent.children.append(t_child)
     return towers
 
