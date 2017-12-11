@@ -86,8 +86,9 @@ def get_base_tower(towers):
 
 def main():
     lines = parse_input(common.read_input(7))
-
-    answer_1 = 'Unknown'
+    towers = create_towers_from_input(lines)
+    t_base = get_base_tower(towers)
+    answer_1 = t_base.name
     print('The answer to part 1 is: {}'.format(answer_1))
     answer_2 = 'Unknown'
     print('The answer to part 2 is: {}'.format(answer_2))
