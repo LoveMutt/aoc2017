@@ -22,6 +22,22 @@ cntj (57)'''
     return s
 
 
+def get_test_towers():
+    lines = parse_input(get_test_input())
+    towers = create_towers_from_input(lines)
+    return towers
+
+
+def get_towers_with_parents(towers):
+    # type: (list[Tower]) -> list[Tower]
+    return [t for t in towers if t.parent]
+
+
+def get_towers_with_children(towers):
+    # type: (list[Tower]) -> list[Tower]
+    return [t for t in towers if t.children]
+
+
 class TestDay(unittest.TestCase):
     def test_parse_input(self):
         for line in parse_input(get_test_input()):
@@ -56,7 +72,6 @@ class TestDay(unittest.TestCase):
             self.assertIn(child, towers)
             self.assertEqual(child.parent, t_parent)
 
-
     def test_create_towers_from_input(self):
         lines = parse_input(get_test_input())
         towers = create_towers_from_input(lines)
@@ -67,3 +82,14 @@ class TestDay(unittest.TestCase):
             self.assertIsInstance(t.children, list)
             for t_child in t.children:
                 self.assertIn(t_child, towers)
+
+        towers_with_parents = get_towers_with_parents(towers)
+        towers_with_children = get_towers_with_children(towers)
+        self.assertEqual(4, len(towers_with_children))
+        self.assertEqual(12, len(towers_with_parents))
+
+    def test_get_base_tower(self):
+        lines = parse_input(get_test_input())
+        towers = create_towers_from_input(lines)
+        t_base = get_base_tower(towers)
+        self.assertEqual(t_base.name, 'tknk')
