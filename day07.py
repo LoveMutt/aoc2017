@@ -84,12 +84,33 @@ def get_base_tower(towers):
     return None
 
 
+def get_subtower_weights(tower):
+    weights = [tower.weight]
+    for i in range(len(tower.children)):
+        weights.append(get_subtower_weight(tower.children[i]))
+    return weights
+
+
+def get_subtower_weight(tower):
+    # type: (Tower) -> int
+    return sum(get_subtower_weights(tower))
+
+
+def find_anomaly(towers):
+    sub_weights = []
+    lvl_1 = get_base_tower(towers=towers).children
+    for t in lvl_1:
+        sub_weights.append(get_subtower_weights(t))
+    pass
+
+
 def main():
     lines = parse_input(common.read_input(7))
     towers = create_towers_from_input(lines)
     t_base = get_base_tower(towers)
     answer_1 = t_base.name
     print('The answer to part 1 is: {}'.format(answer_1))
+    row = find_anomaly(towers)
     answer_2 = 'Unknown'
     print('The answer to part 2 is: {}'.format(answer_2))
 

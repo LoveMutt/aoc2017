@@ -93,3 +93,12 @@ class TestDay(unittest.TestCase):
         towers = create_towers_from_input(lines)
         t_base = get_base_tower(towers)
         self.assertEqual(t_base.name, 'tknk')
+
+    def test_get_subtower_weight(self):
+        lines = parse_input(get_test_input())
+        towers = create_towers_from_input(lines)
+        t_base = get_base_tower(towers)
+        actual_weights = []
+        for i in range(len(t_base.children)):
+            actual_weights.append(get_subtower_weight(t_base.children[i]))
+        self.assertListEqual([251, 243, 243], actual_weights)
