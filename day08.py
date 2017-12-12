@@ -31,14 +31,21 @@ class RegisterCollection:
         if isinstance(registers, list):
             for r in registers:
                 self.add_register(r)
+        self._max_seen = -1
 
     @property
     def ids(self):
         return [r.id for r in self.registers]
 
+    @property
+    def max_seen(self):
+        return self._max_seen
+
     def add_register(self, register):
         if not register.id in [r.id for r in self.registers]:
             self.registers.append(register)
+            if register.value > self._max_seen:
+                self._max_seen = register.value
 
     @staticmethod
     def parse_instruction(s_inst):
@@ -70,6 +77,8 @@ class RegisterCollection:
             r = self.get_register_by_id(tgt_reg)  # type: Register
             s_inst = '{} {}'.format(direction, val)
             r.exec_inst(s_inst)
+            if r.value > self._max_seen:
+                self._max_seen = r.value
 
     def proc(self, instructions):
         # type: (list(str)) -> None
@@ -102,7 +111,7 @@ def main():
     rc = init_collection_from_input(s_instr)
     rc.proc(parse_input(s_instr))
     answer_1 = max([r.value for r in rc.registers])
-    answer_2 = 'Unknown'
+    answer_2 = rc.max_seen
     print('The answer to part 1 is: {}'.format(answer_1))
     print('The answer to part 2 is: {}'.format(answer_2))
 
