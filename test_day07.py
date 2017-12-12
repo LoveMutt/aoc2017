@@ -73,7 +73,7 @@ class TestDay(unittest.TestCase):
             self.assertEqual(child.parent, t_parent)
 
     def test_create_towers_from_input(self):
-        towers = create_towers_from_input(get_test_input())
+        towers = create_towers_from_text(get_test_input())
         for t in towers:
             self.assertIsInstance(t, Tower)
             self.assertTrue(t.name)
@@ -88,12 +88,12 @@ class TestDay(unittest.TestCase):
         self.assertEqual(12, len(towers_with_parents))
 
     def test_get_base_tower(self):
-        towers = create_towers_from_input(get_test_input())
+        towers = create_towers_from_text(get_test_input())
         t_base = get_base_tower(towers)
         self.assertEqual(t_base.name, 'tknk')
 
     def test_get_subtower_weight(self):
-        towers = create_towers_from_input(get_test_input())
+        towers = create_towers_from_text(get_test_input())
         t_base = get_base_tower(towers)
         actual_weights = []
         for i in range(len(t_base.children)):
