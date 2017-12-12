@@ -14,6 +14,46 @@ class Tower:
         if self.children is None:
             self.children = []
         self.parent = parent
+        self._ancestors = None
+        self._descendants = None
+
+    @property
+    def total_weight(self):
+        total = self.weight
+        for child in self.children:
+            total += child.total_weight
+        return total
+
+    @property
+    def balanced(self):
+        if self.children:
+            return self.children[0].total_weight == self.children[1].total_weight == self.children[2].total_weight
+        return True
+
+    @property
+    def ancestors(self):
+        if self._ancestors:
+            return self._ancestors
+        ancestors = []
+        t_parent = self.parent
+        while t_parent is not None:
+            ancestors.append(t_parent)
+            t_parent = t_parent.parent
+        self._ancestors = ancestors
+        return self._ancestors
+
+    @property
+    def descendants(self):
+        if self._descendants:
+            return self._descendants
+        descendants = []
+        t_child = self
+        for t_child in t_child.children:
+            descendants.append(t_child)
+            descendants.extend(t_child.descendants)
+        self._descendants = descendants
+        return self._descendants
+
 
     def __repr__(self):
         return "<Tower name='{}', weight={}, children={}, parent={} />".format(self.name,
@@ -24,6 +64,16 @@ class Tower:
 
 def parse_input(intext):
     return [line for line in intext.split('\n') if line]
+
+
+def get_towers_except(t, towers):
+    # type: (Tower, list[Tower]) -> list[Tower]
+    return [tw for tw in towers if tw is not t]
+
+
+def create_towers_from_text(intext):
+    lines = parse_input(intext=intext)
+    return create_towers_from_input(lines)
 
 
 def tower_from_input(s):
@@ -96,13 +146,21 @@ def get_subtower_weight(tower):
     return sum(get_subtower_weights(tower))
 
 
-def find_anomaly(towers):
-    sub_weights = []
-    lvl_1 = get_base_tower(towers=towers).children
-    for t in lvl_1:
-        sub_weights.append(get_subtower_weights(t))
-    pass
+def find_leafs(towers):
+    # type: (list[Tower]) -> set[Tower]
+    return set([t for t in towers if t.parent and not t.children])
 
+
+def find_anomaly(towers):
+    # type: (list[Tower]) -> Tower
+    sub_weights = []
+    # depth-first traversal to find unbalanced disc
+    for leaf in find_leafs(towers=towers):
+        while leaf.parent:
+            leaf = leaf.parent
+            if not leaf.balanced:
+                return leaf
+    return None
 
 def main():
     lines = parse_input(common.read_input(7))
