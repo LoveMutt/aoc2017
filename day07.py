@@ -26,8 +26,9 @@ class Tower:
 
     @property
     def balanced(self):
-        if self.children:
-            return self.children[0].total_weight == self.children[1].total_weight == self.children[2].total_weight
+        for t_test, t_rest in split_head(self.children):
+            if not t_test.total_weight in [t.total_weight for t in t_rest]:
+                return False
         return True
 
     @property
@@ -95,6 +96,14 @@ def get_tower_name(s):
     return name
 
 
+def split_head(inlist):
+    while len(inlist) > 1:
+        head = inlist[0]
+        tail = inlist[1:]
+        yield head, tail
+        inlist = tail
+
+
 def get_tower_by_name(name, towers):
     # type: (str, list[Tower]) -> Tower
     name = get_tower_name(name)
@@ -151,16 +160,43 @@ def find_leafs(towers):
     return set([t for t in towers if t.parent and not t.children])
 
 
+def get_off_weight_tower(towers):
+    # type: (list[Tower]) -> tuple
+    bad = list()
+    good = list()
+
+
 def find_anomaly(towers):
     # type: (list[Tower]) -> Tower
     sub_weights = []
     # depth-first traversal to find unbalanced disc
+    unbalanced_tower = None
     for leaf in find_leafs(towers=towers):
         while leaf.parent:
             leaf = leaf.parent
             if not leaf.balanced:
-                return leaf
-    return None
+                unbalanced_tower = leaf
+                break
+        if unbalanced_tower is None:
+            break
+    log.debug('Found unbalanced tower: {}'.format(unbalanced_tower.name))
+    ub_children = unbalanced_tower.children
+    log.debug('Testing weights of unbalanced tower\'s children')
+    if ub_children[0] == ub_children[1] or ub_children[0] == ub_children[2]:
+        if ub_children[0] == ub_children[1]:
+            log.debug('{} weighs the same as {}, so {} is anomalous'.format(ub_children[0].name,
+                                                                            ub_children[1].name,
+                                                                            ub_children[2].name))
+            return ub_children[2]
+        log.debug('{} weighs the same as {}, so {} is anomalous'.format(ub_children[0].name,
+                                                                        ub_children[2].name,
+                                                                        ub_children[1].name))
+        return ub_children[1]
+    log.debug('{} does not weight the same as {} or {}'.format(ub_children[0].name,
+                                                               ub_children[2].name,
+                                                               ub_children[1].name))
+    return ub_children[0]
+
 
 def main():
     lines = parse_input(common.read_input(7))
@@ -168,8 +204,11 @@ def main():
     t_base = get_base_tower(towers)
     answer_1 = t_base.name
     print('The answer to part 1 is: {}'.format(answer_1))
-    row = find_anomaly(towers)
-    answer_2 = 'Unknown'
+    unbalanced_tower = find_anomaly(towers)
+    good_children = [t for t in unbalanced_tower.parent.children if t is not unbalanced_tower]
+    weight_diff = good_children[0].weight - unbalanced_tower.weight
+    new_weight = unbalanced_tower.weight + weight_diff
+    answer_2 = new_weight
     print('The answer to part 2 is: {}'.format(answer_2))
 
 
