@@ -73,8 +73,7 @@ class TestDay(unittest.TestCase):
             self.assertEqual(child.parent, t_parent)
 
     def test_create_towers_from_input(self):
-        lines = parse_input(get_test_input())
-        towers = create_towers_from_input(lines)
+        towers = create_towers_from_input(get_test_input())
         for t in towers:
             self.assertIsInstance(t, Tower)
             self.assertTrue(t.name)
@@ -89,16 +88,63 @@ class TestDay(unittest.TestCase):
         self.assertEqual(12, len(towers_with_parents))
 
     def test_get_base_tower(self):
-        lines = parse_input(get_test_input())
-        towers = create_towers_from_input(lines)
+        towers = create_towers_from_input(get_test_input())
         t_base = get_base_tower(towers)
         self.assertEqual(t_base.name, 'tknk')
 
     def test_get_subtower_weight(self):
-        lines = parse_input(get_test_input())
-        towers = create_towers_from_input(lines)
+        towers = create_towers_from_input(get_test_input())
         t_base = get_base_tower(towers)
         actual_weights = []
         for i in range(len(t_base.children)):
             actual_weights.append(get_subtower_weight(t_base.children[i]))
         self.assertListEqual([251, 243, 243], actual_weights)
+
+    def test_total_weight(self):
+        towers = create_towers_from_text(get_test_input())
+        t_ugml = get_tower_by_name('ugml', towers)
+        t_padx = get_tower_by_name('padx', towers)
+        t_fwft = get_tower_by_name('fwft', towers)
+        self.assertEqual(251, t_ugml.total_weight)
+        self.assertEqual(243, t_padx.total_weight)
+        self.assertEqual(243, t_fwft.total_weight)
+
+    def test_balanced(self):
+        towers = create_towers_from_text(get_test_input())
+        t_ugml = get_tower_by_name('ugml', towers)
+        t_padx = get_tower_by_name('padx', towers)
+        t_fwft = get_tower_by_name('fwft', towers)
+        self.assertTrue(t_ugml.balanced)
+        self.assertTrue(t_padx.balanced)
+        self.assertTrue(t_fwft.balanced)
+        t_base = get_base_tower(towers)
+        self.assertFalse(t_base.balanced)
+
+    def test_find_leafs(self):
+        towers = create_towers_from_text(get_test_input())
+        expected_leafs = set([t for t in towers if t.parent and not t.children])
+        self.assertSetEqual(expected_leafs, find_leafs(towers))
+
+    def test_find_anomaly(self):
+        towers = create_towers_from_text(get_test_input())
+        bad_tower = get_tower_by_name('ugml', towers)
+        self.assertEqual(bad_tower, find_anomaly(towers))
+
+    def test_ancestors(self):
+        towers = create_towers_from_text(get_test_input())
+        t_1 = get_tower_by_name('gyxo', towers)
+        t_2 = get_tower_by_name('ugml', towers)
+        t_3 = get_tower_by_name('tknk', towers)
+        self.assertListEqual([t_2, t_3], t_1.ancestors)
+        self.assertListEqual([t_3], t_2.ancestors)
+
+    def test_descendants(self):
+        towers = create_towers_from_text(get_test_input())
+        t_1 = get_tower_by_name('tknk', towers)
+        t_2 = get_tower_by_name('ugml', towers)
+        t_3 = get_tower_by_name('gyxo', towers)
+        t_4 = get_tower_by_name('ebii', towers)
+        t_5 = get_tower_by_name('jptl', towers)
+        self.assertListEqual([t_3, t_4, t_5], t_2.descendants)
+        self.assertSetEqual(set(get_towers_except(t_1, towers)), set(t_1.descendants))
+        self.assertListEqual([], t_3.descendants)
