@@ -1,4 +1,5 @@
 import common
+import sys
 
 log = common.get_logger(__name__)
 
@@ -16,19 +17,24 @@ class Tower:
         self.parent = parent
         self._ancestors = None
         self._descendants = None
+        self._total_weight = 0
 
     @property
     def total_weight(self):
+        if self._total_weight:
+            return self._total_weight
         total = self.weight
         for child in self.children:
             total += child.total_weight
-        return total
+        self._total_weight = total
+        return self._total_weight
 
     @property
     def balanced(self):
-        for t_test, t_rest in split_head(self.children):
-            if not t_test.total_weight in [t.total_weight for t in t_rest]:
-                return False
+        # select one child
+        if self.children:
+            child = self.children[0]
+            return [child.total_weight] * len(self.children) == [c.total_weight for c in self.children]
         return True
 
     @property
@@ -57,11 +63,12 @@ class Tower:
 
 
     def __repr__(self):
-        return "<Tower name='{}', weight={}, children={}, parent={} />".format(self.name,
-                                                                               self.weight,
-                                                                               self.children,
-                                                                               self.parent,
-                                                                               )
+        return "<Tower name='{}', weight={}, total_weight={}, children={}, parent={} />".format(self.name,
+                                                                                                self.weight,
+                                                                                                self.total_weight,
+                                                                                                len(self.children),
+                                                                                                self.parent,
+                                                                                                )
 
 def parse_input(intext):
     return [line for line in intext.split('\n') if line]
@@ -143,59 +150,72 @@ def get_base_tower(towers):
     return None
 
 
-def get_subtower_weights(tower):
-    weights = [tower.weight]
-    for i in range(len(tower.children)):
-        weights.append(get_subtower_weight(tower.children[i]))
-    return weights
-
-
-def get_subtower_weight(tower):
-    # type: (Tower) -> int
-    return sum(get_subtower_weights(tower))
-
-
 def find_leafs(towers):
     # type: (list[Tower]) -> set[Tower]
     return set([t for t in towers if t.parent and not t.children])
 
 
-def get_off_weight_tower(towers):
-    # type: (list[Tower]) -> tuple
-    bad = list()
-    good = list()
-
-
 def find_anomaly(towers):
     # type: (list[Tower]) -> Tower
-    sub_weights = []
     # depth-first traversal to find unbalanced disc
     unbalanced_tower = None
     for leaf in find_leafs(towers=towers):
+        log.debug('Working from leaves to base to find unbalanced tower')
         while leaf.parent:
-            leaf = leaf.parent
-            if not leaf.balanced:
-                unbalanced_tower = leaf
+            t_parent = leaf.parent
+            if not t_parent.balanced:
+                log.info('Found unbalanced tower at {}'.format(t_parent))
+                unbalanced_tower = t_parent
                 break
+            leaf = t_parent
         if unbalanced_tower is None:
             break
     log.debug('Found unbalanced tower: {}'.format(unbalanced_tower.name))
-    ub_children = unbalanced_tower.children
     log.debug('Testing weights of unbalanced tower\'s children')
+    log.info('finding any unbalanced children of the current tower')
+    ub_children = [c for c in unbalanced_tower.children if not c.balanced]
+    ub_child = unbalanced_tower
+    while ub_children:
+        assert len(ub_children) == 1
+        ub_child = ub_children[0]
+        ub_children = [c for c in ub_child.children if not c.balanced]
+    log.info('Found top-most unbalanced tower: {}'.format(ub_child))
+    ub_children = ub_child.children
     if ub_children[0] == ub_children[1] or ub_children[0] == ub_children[2]:
         if ub_children[0] == ub_children[1]:
             log.debug('{} weighs the same as {}, so {} is anomalous'.format(ub_children[0].name,
                                                                             ub_children[1].name,
                                                                             ub_children[2].name))
-            return ub_children[2]
-        log.debug('{} weighs the same as {}, so {} is anomalous'.format(ub_children[0].name,
-                                                                        ub_children[2].name,
-                                                                        ub_children[1].name))
-        return ub_children[1]
-    log.debug('{} does not weight the same as {} or {}'.format(ub_children[0].name,
-                                                               ub_children[2].name,
-                                                               ub_children[1].name))
-    return ub_children[0]
+            anomaly = ub_children[2]
+        else:
+            log.debug('{} weighs the same as {}, so {} is anomalous'.format(ub_children[0].name,
+                                                                            ub_children[2].name,
+                                                                            ub_children[1].name))
+            anomaly = ub_children[1]
+    else:
+        log.debug('{} does not weight the same as {} or {}'.format(ub_children[0].name,
+                                                                   ub_children[2].name,
+                                                                   ub_children[1].name))
+
+        anomaly = ub_children[0]
+    return anomaly
+
+def get_weight_correction(tower):
+    # type: (Tower) -> int
+    t_parent = tower.parent
+    equal_children = [t for t in t_parent.children if t != tower]  # type: list(Tower)
+    return equal_children[0].total_weight - tower.total_weight
+
+
+def verify_wrong_weight(bad_tower, towers):
+    # type: (Tower, list[Tower]) -> bool
+    most_towers = [t for t in towers if t is not bad_tower and t not in bad_tower.ancestors]
+    for t in most_towers:
+        if t.children:
+            test_weight = t.children[0].total_weight
+            if not [test_weight] * len(t.children) == [c.total_weight for c in t.children]:
+                return False
+    return True
 
 
 def main():
@@ -205,9 +225,11 @@ def main():
     answer_1 = t_base.name
     print('The answer to part 1 is: {}'.format(answer_1))
     unbalanced_tower = find_anomaly(towers)
-    good_children = [t for t in unbalanced_tower.parent.children if t is not unbalanced_tower]
-    weight_diff = good_children[0].weight - unbalanced_tower.weight
-    new_weight = unbalanced_tower.weight + weight_diff
+    weight_corr = get_weight_correction(unbalanced_tower)
+    new_weight = unbalanced_tower.weight + weight_corr
+    if not verify_wrong_weight(unbalanced_tower, towers):
+        log.error('The bad tower was not correct')
+        sys.exit(1)
     answer_2 = new_weight
     print('The answer to part 2 is: {}'.format(answer_2))
 
