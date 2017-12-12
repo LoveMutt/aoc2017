@@ -71,16 +71,25 @@ class RegisterCollection:
             s_inst = '{} {}'.format(direction, val)
             r.exec_inst(s_inst)
 
+    def proc(self, instructions):
+        # type: (list(str)) -> None
+        for inst in instructions:
+            self.exec_instruction(inst)
+
 
 def parse_input(intext):
-    return intext.split('\n')
+    return [r.strip() for r in intext.split('\n') if r]
 
 
 def init_collection_from_input(intext):
     lines = parse_input(intext)
     rc = RegisterCollection()
     for line in lines:
-        r_name1, _, _, _, r_name2, _, _ = line.split(' ')
+        try:
+            r_name1, _, _, _, r_name2, _, _ = line.split(' ')
+        except ValueError as e:
+            log.exception('Error on input: {}'.format(line))
+            raise e
         reg1 = Register(id=r_name1)
         reg2 = Register(id=r_name2)
         rc.add_register(register=reg1)
@@ -89,7 +98,10 @@ def init_collection_from_input(intext):
 
 
 def main():
-    answer_1 = 'Unknown'
+    s_instr = common.read_input(8)
+    rc = init_collection_from_input(s_instr)
+    rc.proc(parse_input(s_instr))
+    answer_1 = max([r.value for r in rc.registers])
     answer_2 = 'Unknown'
     print('The answer to part 1 is: {}'.format(answer_1))
     print('The answer to part 2 is: {}'.format(answer_2))
