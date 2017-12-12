@@ -92,14 +92,6 @@ class TestDay(unittest.TestCase):
         t_base = get_base_tower(towers)
         self.assertEqual(t_base.name, 'tknk')
 
-    def test_get_subtower_weight(self):
-        towers = create_towers_from_text(get_test_input())
-        t_base = get_base_tower(towers)
-        actual_weights = []
-        for i in range(len(t_base.children)):
-            actual_weights.append(get_subtower_weight(t_base.children[i]))
-        self.assertListEqual([251, 243, 243], actual_weights)
-
     def test_total_weight(self):
         towers = create_towers_from_text(get_test_input())
         t_ugml = get_tower_by_name('ugml', towers)
@@ -130,6 +122,13 @@ class TestDay(unittest.TestCase):
         bad_tower = get_tower_by_name('ugml', towers)
         self.assertEqual(bad_tower, find_anomaly(towers))
 
+    def test_get_weight_correction(self):
+        towers = create_towers_from_text(get_test_input())
+        bad_tower = find_anomaly(towers)
+        weight_corr = get_weight_correction(bad_tower)
+        self.assertEqual(-8, weight_corr)
+        self.assertEqual(60, bad_tower.weight + weight_corr)
+
     def test_ancestors(self):
         towers = create_towers_from_text(get_test_input())
         t_1 = get_tower_by_name('gyxo', towers)
@@ -148,3 +147,8 @@ class TestDay(unittest.TestCase):
         self.assertListEqual([t_3, t_4, t_5], t_2.descendants)
         self.assertSetEqual(set(get_towers_except(t_1, towers)), set(t_1.descendants))
         self.assertListEqual([], t_3.descendants)
+
+    def test_verify(self):
+        towers = create_towers_from_text(get_test_input())
+        bad_tower = find_anomaly(towers)
+        self.assertTrue(verify_wrong_weight(bad_tower=bad_tower, towers=towers))
