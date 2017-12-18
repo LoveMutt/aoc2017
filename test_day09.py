@@ -17,7 +17,7 @@ class TestDay(unittest.TestCase):
             2: {TEXT: '{{{}}}',
                 SCORE: 6},
             3: {TEXT: '{{},{}}',
-                SCORE: 6},
+                SCORE: 5},
             4: {TEXT: '{{{},{},{{}}}}',
                 SCORE: 16},
             5: {TEXT: '{<a>,<a>,<a>,<a>}',
@@ -42,14 +42,20 @@ class TestDay(unittest.TestCase):
 
     def test_garbage_cleanup(self):
         txt = self.inputs.get(5).get(TEXT)
-        self.assertEqual('{,,,}', GarbageCleaner.cleanup_garbage(txt))
+        self.assertEqual('{,,,}', StrParser.cleanup_garbage(txt))
         txt = self.inputs.get(6).get(TEXT)
-        self.assertEqual('{{},{},{},{}}', GarbageCleaner.cleanup_garbage(txt))
+        self.assertEqual('{{},{},{},{}}', StrParser.cleanup_garbage(txt))
         txt = self.inputs.get(7).get(TEXT)
-        self.assertEqual('{{},{},{},{}}', GarbageCleaner.cleanup_garbage(txt))
+        self.assertEqual('{{},{},{},{}}', StrParser.cleanup_garbage(txt))
         txt = self.inputs.get(8).get(TEXT)
-        self.assertEqual('{{}}', GarbageCleaner.cleanup_garbage(txt))
+        self.assertEqual('{{}}', StrParser.cleanup_garbage(txt))
 
         for idx, d_garbage in self.garbages.items():
             text = d_garbage.get(TEXT)
-            self.assertEqual('', GarbageCleaner.cleanup_garbage(text))
+            self.assertEqual('', StrParser.cleanup_garbage(text))
+
+    def test_count_group_score(self):
+        for d in self.inputs.values():
+            clean_text = StrParser.cleanup_garbage(d.get(TEXT))
+            groups = StrParser.build_groups(clean_text)
+            self.assertEqual(d.get(SCORE), StrParser.count_group_score(groups))
