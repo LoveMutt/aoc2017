@@ -30,6 +30,16 @@ class TestDay(unittest.TestCase):
                 SCORE: 3}
         }
 
+        self.garbages = {
+            1: {TEXT: '<>'},
+            2: {TEXT: '<random characters>'},
+            3: {TEXT: '<<<<>'},
+            4: {TEXT: '<{!>}>'},
+            5: {TEXT: '<!!>'},
+            6: {TEXT: '<!!!>>'},
+            7: {TEXT: '<{o"i!a,<{i<a>'},
+        }
+
     def test_garbage_cleanup(self):
         txt = self.inputs.get(5).get(TEXT)
         self.assertEqual('{,,,}', GarbageCleaner.cleanup_garbage(txt))
@@ -39,3 +49,7 @@ class TestDay(unittest.TestCase):
         self.assertEqual('{{},{},{},{}}', GarbageCleaner.cleanup_garbage(txt))
         txt = self.inputs.get(8).get(TEXT)
         self.assertEqual('{{}}', GarbageCleaner.cleanup_garbage(txt))
+
+        for idx, d_garbage in self.garbages.items():
+            text = d_garbage.get(TEXT)
+            self.assertEqual('', GarbageCleaner.cleanup_garbage(text))
