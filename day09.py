@@ -3,13 +3,27 @@ import common
 log = common.get_logger(__name__)
 
 
-class GarbageCleaner:
+class Group:
+    def __init__(self):
+        self.parent = None
+
+    @property
+    def score(self):
+        p_score = 0
+        if self.parent is not None:
+            p_score = self.parent.score
+        return p_score + 1
+
+
+class StrParser:
     GARBAGE_START = '<'
     GARBAGE_END = '>'
+    GROUP_START = '{'
+    GROUP_END = '}'
     NEGATOR = '!'
 
     def __init__(self):
-        pass
+        self.groups = []
 
     @classmethod
     def cleanup_garbage(cls, intext):
@@ -35,10 +49,40 @@ class GarbageCleaner:
             txt_ptr += 1
         return clean_str
 
+    @classmethod
+    def build_groups(cls, intext):
+        # type: (str) -> list[int]
+        txt_ptr = 0
+        grp_ptr = -1
+        groups = []
+        while txt_ptr < len(intext):
+            if intext[txt_ptr] == cls.GROUP_START:
+                grp_ptr += 1
+                if len(groups) <= grp_ptr:
+                    groups.append(1)
+                else:
+                    groups[grp_ptr] += 1
+            elif intext[txt_ptr] == cls.GROUP_END:
+                grp_ptr -= 1
+            else:
+                # just skip because we're inside a group
+                pass
+            txt_ptr += 1
+        return groups
+
+    @classmethod
+    def count_group_score(cls, groups):
+        # type: (list[int]) -> int
+        score = 0
+        for i in range(len(groups)):
+            multiplier = i + 1
+            score += multiplier * groups[i]
+        return score
+
 
 def main():
     text = common.read_input(9)
-    answer_1 = 'Unknown'
+    groups = StrParser.build_groups(text)
     print('The answer to part 1 is: {}'.format(answer_1))
     answer_2 = 'Unknown'
     print('The answer to part 2 is: {}'.format(answer_2))
