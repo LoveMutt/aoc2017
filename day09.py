@@ -27,10 +27,11 @@ class StrParser:
 
     @classmethod
     def cleanup_garbage(cls, intext):
-        # type: (str) -> str
+        # type: (str) -> (str, int)
         txt_ptr = 0
         clean_str = ''
         in_garbage = False
+        collected_count = 0
         while txt_ptr < len(intext):  # starting reading all input
             if in_garbage:
                 if intext[txt_ptr] == cls.NEGATOR:
@@ -40,6 +41,8 @@ class StrParser:
                     txt_ptr += 1
                 elif intext[txt_ptr] == cls.GARBAGE_END:
                     in_garbage = False
+                else:
+                    collected_count += 1
             else:
                 if intext[txt_ptr] == cls.GARBAGE_START:
                     log.debug('Found start of garbage at character index: {}'.format(txt_ptr))
@@ -47,7 +50,7 @@ class StrParser:
                 else:
                     clean_str += intext[txt_ptr]
             txt_ptr += 1
-        return clean_str
+        return clean_str, collected_count
 
     @classmethod
     def build_groups(cls, intext):
@@ -82,11 +85,11 @@ class StrParser:
 
 def main():
     text = common.read_input(9)
-    text = StrParser.cleanup_garbage(text)
+    text, g_count = StrParser.cleanup_garbage(text)
     groups = StrParser.build_groups(text)
     answer_1 = StrParser.count_group_score(groups)
     print('The answer to part 1 is: {}'.format(answer_1))
-    answer_2 = 'Unknown'
+    answer_2 = g_count
     print('The answer to part 2 is: {}'.format(answer_2))
 
 
