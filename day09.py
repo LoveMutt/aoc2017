@@ -82,7 +82,9 @@ class StrParser:
 
 def main():
     text = common.read_input(9)
+    text = StrParser.cleanup_garbage(text)
     groups = StrParser.build_groups(text)
+    answer_1 = StrParser.count_group_score(groups)
     print('The answer to part 1 is: {}'.format(answer_1))
     answer_2 = 'Unknown'
     print('The answer to part 2 is: {}'.format(answer_2))
