@@ -3,11 +3,13 @@ import common
 log = common.get_logger(__name__)
 
 
-def _init_elements():
+def init_elements():
+    # type: () -> list[int]
     return list(range(256))
 
 
 def reverse_sublist(in_l, start_index, num):
+    # type: (list[int], int, int) -> list[int]
     sub_l = []
     for i in range(num):
         idx = (start_index + i) % len(in_l)
@@ -17,6 +19,13 @@ def reverse_sublist(in_l, start_index, num):
         idx = (start_index + i) % len(in_l)
         in_l[idx] = sub_l[i]
     return in_l
+
+
+def get_new_pos(in_l, lengths_l, idx, skip):
+    # type: (list[int], list[int], int, int) -> int
+    length = lengths_l[idx]
+    target_idx = (length + skip) % len(in_l)
+    return target_idx
 
 
 def main():
