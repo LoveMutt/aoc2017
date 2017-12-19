@@ -20,4 +20,7 @@ class TestDay(unittest.TestCase):
         self.inputs = get_test_inputs()
 
     def test_reverse_sublist(self):
-        reverse_sublist(init_elements(), 0, 2)
+        reverse_slice(init_elements(), 0, 2)
+
+    def test_hash(self):
+        self.assertEqual(12, hash(get_test_inputs(), init_test_elements()))
