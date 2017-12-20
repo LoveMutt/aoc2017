@@ -91,6 +91,7 @@ def convert_list_to_ascii(s):
 
 
 def get_ascii_sequence(intext):
+    intext = intext.strip()
     l_inputs = convert_list_to_ascii(intext)
     l_inputs.extend([17, 31, 73, 47, 23])
     return l_inputs
