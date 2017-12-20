@@ -11,7 +11,7 @@ def get_test_inputs():
 
 
 def init_test_elements():
-    return list(range(5))
+    return [0, 1, 2, 3, 4]
 
 
 class TestDay(unittest.TestCase):
@@ -20,7 +20,12 @@ class TestDay(unittest.TestCase):
         self.inputs = get_test_inputs()
 
     def test_reverse_sublist(self):
-        reverse_slice(init_elements(), 0, 2)
+        l_rev = reverse_slice(init_test_elements(), 0, 2)
+        self.assertListEqual([1, 0, 2, 3, 4], l_rev)
+        l_rev = reverse_slice(l_rev, 2, 2)
+        self.assertListEqual([1, 0, 3, 2, 4], l_rev)
+        l_rev = reverse_slice(l_rev, 4, 2)
+        self.assertListEqual([4, 0, 3, 2, 1], l_rev)
 
     def test_hash(self):
         self.assertEqual(12, hash(get_test_inputs(), init_test_elements()))
