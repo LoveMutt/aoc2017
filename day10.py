@@ -10,47 +10,49 @@ def init_elements():
 
 def reverse_slice(in_l, start_index, num):
     # type: (list[int], int, int) -> list[int]
+    if num < 2:
+        return in_l
     sub_l = []
     for i in range(num):
         idx = (start_index + i) % len(in_l)
         sub_l.append(in_l[idx])
     sub_l.reverse()
+    l_copy = in_l.copy()
     for i in range(num):
-        idx = (start_index + i) % len(in_l)
-        in_l[idx] = sub_l[i]
-    return in_l
+        idx = (start_index + i) % len(l_copy)
+        l_copy[idx] = sub_l[i]
+    return l_copy
 
 
-def get_new_pos(in_l, lengths_l, idx, skip):
-    # type: (list[int], list[int], int, int) -> int
-    length = lengths_l[idx]
-    target_idx = (length + skip) % len(in_l)
-    return target_idx
-
-
-def hash(len_l, num_l):
+def hash(l_lengths, l_numbers):
     # type: (list[int]) -> int
     # init
     skip = 0
     pos = 0
 
-    for i in range(len(len_l)):
-        l = len_l[i]
+    for l in l_lengths:
         # ignore if longer than input list
-        if l > len(len_l):
-            log.debug('Ignoring index {} ({})'.format(i, len_l[i]))
+        if l > len(l_numbers):
+            log.debug('Ignoring length {}'.format(l))
             continue
         # step 1: reverse the order of a slice
-        num_l = reverse_slice(num_l, start_index=pos, num=l)
-        # step 2: advance
-        pos = get_new_pos(in_l=num_l, lengths_l=len_l, idx=pos, skip=skip)
+        l_new = reverse_slice(l_numbers, start_index=pos, num=l)
+        l_numbers = l_new
+        # step 2: Move the current position forward by that length plus the skip size
+        pos = (pos + l + skip) % len(l_numbers)
         # step 3: increase step size by 1
         skip += 1
-    return len_l[0] * len_l[1]
+    log.info('first two values are {}, {}'.format(l_numbers[0], l_numbers[1]))
+    return l_numbers[0] * l_numbers[1]  # what is the result of multiplying the first two numbers in the list
 
 
 def main():
-    answer_1 = 'Unknown'
+    intext = common.read_input(10)
+    log.info('Initializing lists...')
+    l_lengths = [int(n.strip()) for n in intext.split(',')]
+    l_numbers = init_elements()
+    log.info('Starting hash for part 1...')
+    answer_1 = hash(l_lengths, l_numbers)
     print('The answer to part 1 is: {}'.format(answer_1))
     answer_2 = 'Unknown'
     print('The answer to part 2 is: {}'.format(answer_2))
