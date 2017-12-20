@@ -1,3 +1,4 @@
+import binascii
 import common
 
 log = common.get_logger(__name__)
@@ -63,6 +64,14 @@ def dense_hash(l_numbers):
             val ^= l_numbers[idx]
         l_dense_hash.append(val)
     return l_dense_hash
+
+
+def hexlify_dense_hash(l_dh):
+    # type: (list[int]) -> str
+    out = ''
+    for n in l_dh:
+        out += '{0:02x}'.format(n)  # from https://stackoverflow.com/a/10218221/761829
+    return out
 
 
 def convert_to_ord(c):

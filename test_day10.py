@@ -42,3 +42,8 @@ class TestDay(unittest.TestCase):
         input = [65, 27, 9, 1, 4, 3, 40, 50, 91, 7, 6, 0, 2, 5, 68, 22]
         vals = dense_hash(input)
         self.assertEqual(64, vals[0])
+
+    def test_hexlify_dense_hash(self):
+        l_in = [64, 7, 255]
+        tmp = hexlify_dense_hash(l_in)
+        self.assertEqual('4007ff', tmp)
