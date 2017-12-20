@@ -26,7 +26,7 @@ def reverse_slice(in_l, start_index, num):
 
 
 def hash(l_lengths, l_numbers, skip=0, pos=0):
-    # type: (list[int]) -> (int, int, int)
+    # type: (list[int]) -> (int, list[int], int, int)
     # init
     for l in l_lengths:
         # ignore if longer than input list
@@ -41,27 +41,29 @@ def hash(l_lengths, l_numbers, skip=0, pos=0):
         # step 3: increase step size by 1
         skip += 1
     log.info('first two values are {}, {}'.format(l_numbers[0], l_numbers[1]))
-    return l_numbers[0] * l_numbers[1], skip, pos  # what is the result of multiplying the first two numbers in the list
+    return l_numbers[0] * l_numbers[1], l_numbers, skip, pos  # what is the result of multiplying the first two numbers in the list
 
 
 def hash_n(l_lengths, l_numbers, skip=0, pos=0, n=64):
     # type: (list[int], list[int], int, int) -> (int, int, int)
     hash_val = -1
     for i in range(n):
-        hash_val, skip, pos = hash(l_lengths=l_lengths.copy(), l_numbers=l_numbers.copy(), skip=skip, pos=pos)
-    return hash_val, skip, pos
+        l_copy_lengths = l_lengths.copy()  # using the same length sequence in each round
+        # current position and skip size should be preserved between rounds
+        hash_val, l_numbers, skip, pos = hash(l_lengths=l_copy_lengths, l_numbers=l_numbers, skip=skip, pos=pos)
+    return hash_val, l_numbers, skip, pos
 
 
-def dense_hash(l_numbers):
+def dense_hash(sparse_hash):
     # type: (list[int]) -> list[int]
     MAGIC = 16
     l_dense_hash = []
-    for i in range(int(len(l_numbers) / MAGIC)):
+    for i in range(int(len(sparse_hash) / MAGIC)):
         start = i * MAGIC
         val = 0
         for j in range(MAGIC):
             idx = start + j
-            val ^= l_numbers[idx]
+            val ^= sparse_hash[idx]
         l_dense_hash.append(val)
     return l_dense_hash
 
@@ -91,6 +93,20 @@ def convert_list_to_ascii(s):
 def get_ascii_sequence(intext):
     l_inputs = convert_list_to_ascii(intext)
     l_inputs.extend([17, 31, 73, 47, 23])
+    return l_inputs
+
+
+def get_part_2_hash(l_lengths):
+    # type: () -> str
+    l_numbers = init_elements()
+    # Second, instead of merely running one round like you did above, run a total of 64 rounds
+    _, sparse_hash, _, _ = hash_n(l_lengths=l_lengths, l_numbers=l_numbers)
+    # Once the rounds are complete, you will be left with the numbers from 0 to 255, called the sparse hash
+    # reduce these to a list of only 16 numbers called the dense hash
+    l_dense_hash = dense_hash(sparse_hash=sparse_hash)
+    # Finally, the standard way to represent a Knot Hash is as a single hexadecimal string
+    s_hash = hexlify_dense_hash(l_dh=l_dense_hash)
+    return s_hash
 
 
 def main():
@@ -99,9 +115,12 @@ def main():
     l_lengths = [int(n.strip()) for n in intext.split(',')]
     l_numbers = init_elements()
     log.info('Starting hash for part 1...')
-    answer_1, _, _ = hash(l_lengths, l_numbers)
+    answer_1, _, _, _ = hash(l_lengths, l_numbers)
     print('The answer to part 1 is: {}'.format(answer_1))
-    answer_2 = 'Unknown'
+
+    # First, from now on, your input should be taken not as a list of numbers, but as a string of bytes instead
+    l_lengths = get_ascii_sequence(common.read_input(10))
+    answer_2 = get_part_2_hash(l_lengths=l_lengths)
     print('The answer to part 2 is: {}'.format(answer_2))
 
 
