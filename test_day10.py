@@ -28,7 +28,7 @@ class TestDay(unittest.TestCase):
         self.assertListEqual([4, 0, 3, 2, 1], l_rev)
 
     def test_hash(self):
-        hash_val, _, _ = hash(self.lengths, self.inputs)
+        hash_val, _, _, _ = hash(self.lengths, self.inputs)
         self.assertEqual(12, hash_val)
 
     def test_convert_list_to_code(self):
@@ -47,3 +47,17 @@ class TestDay(unittest.TestCase):
         l_in = [64, 7, 255]
         tmp = hexlify_dense_hash(l_in)
         self.assertEqual('4007ff', tmp)
+
+    def test_get_part_2_hash(self):
+        s_in = ''
+        l_in = get_ascii_sequence(s_in)
+        self.assertEqual('a2582a3a0e66e6e86e3812dcb672a272', get_part_2_hash(l_in))
+        s_in = 'AoC 2017'
+        l_in = get_ascii_sequence(s_in)
+        self.assertEqual('33efeb34ea91902bb2f59c9920caa6cd', get_part_2_hash(l_in))
+        s_in = '1,2,3'
+        l_in = get_ascii_sequence(s_in)
+        self.assertEqual('3efbe78a8d82f29979031a4aa0b16a9d', get_part_2_hash(l_in))
+        s_in = '1,2,4'
+        l_in = get_ascii_sequence(s_in)
+        self.assertEqual('63960835bcdc130f0b66d7ff4f6a5a8e', get_part_2_hash(l_in))
