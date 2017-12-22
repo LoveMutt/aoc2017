@@ -51,11 +51,21 @@ class HexGrid:
 
     @property
     def distance(self):
-        path_x = self.coordinates[0]
-        path_y = self.coordinates[1]
-        origin_x = self.origin[0]
-        origin_y = self.origin[1]
-        return abs(path_x - origin_x) + abs(path_y - origin_y)
+        hex_distance = self.distance_from_hex(self.origin)
+        return hex_distance
+
+    def distance_from_hex(self, h2):
+        # http://keekerdc.com/2011/03/hexagon-grids-coordinate-systems-and-distance-calculations/
+        x_1, y_1, z_1 = self.coordinates
+        x_2, y_2, z_2 = h2.origin
+        dist1 = abs(y_1 - y_2)
+        dist2 = abs(x_1 - x_2)
+        dist3 = abs(z_1 - z_2)
+        hex_distance = max(dist1, dist2, dist3)
+        return hex_distance
+
+    def __repr__(self):
+        return "<HexGrid x={} y={} />".format(self.coordinates[0], self.coordinates[1])
 
 
 def parse_input(s_input):
