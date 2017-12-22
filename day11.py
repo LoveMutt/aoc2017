@@ -25,16 +25,24 @@ class HexGrid:
 
     def move(self, direction):
         # type: (str) -> None
-        x, y = self.coordinates
-        if direction.startswith('n'):
-            y += 1
-        elif direction.startswith('s'):
-            y -= 1
-        if direction.endswith('e'):
-            x += 1
-        elif direction.endswith('w'):
-            x -= 1
-        self.coordinates = (x, y)
+        # See http://keekerdc.com/wp-content/uploads/2011/03/HexGridLandscapeTriCoordinates.gif
+        # N = y+, S = y-  and E = x+, W = x-
+        x, y, z = self.coordinates
+        for d in list(direction):
+            if d == E:
+                x += 1
+                y -= 1
+            elif d == W:
+                x -= 1
+                y += 1
+            elif d == N:
+                y += 1
+                z -= 1
+            elif d == S:
+                y -= 1
+                z += 1
+
+        self.coordinates = (x, y, z)
 
     def follow(self, l_directions):
         # type: (list[str]) -> None
