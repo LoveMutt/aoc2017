@@ -3,15 +3,25 @@ import common
 
 log = common.get_logger(__name__)
 
+N = 'n'
+S = 's'
+E = 'e'
+W = 'w'
+NE = 'ne'
+NW = 'nw'
+SE = 'se'
+SW = 'sw'
+
 
 class HexGrid:
     def __init__(self):
-        self.origin = (0, 0)
-        self.coordinates = (0, 0)  # x, y coordinates
+        self.origin = None  # type: tuple(int, int, int)
+        self.coordinates = None  # type: tuple(int, int, int)
+        self.reset()
 
     def reset(self):
-        self.coordinates = (0, 0)
-        self.origin = (0, 0)
+        self.origin = (0, 0, 0)  # x, y, z
+        self.coordinates = self.origin
 
     def move(self, direction):
         # type: (str) -> None
