@@ -4,8 +4,50 @@ import common
 log = common.get_logger(__name__)
 
 
+class HexGrid:
+    def __init__(self):
+        self.origin = (0, 0)
+        self.coordinates = (0, 0)  # x, y coordinates
+
+    def reset(self):
+        self.coordinates = (0, 0)
+        self.origin = (0, 0)
+
+    def move(self, direction):
+        # type: (str) -> None
+        x, y = self.coordinates
+        if direction.startswith('n'):
+            y += 1
+        elif direction.startswith('s'):
+            y -= 1
+        if direction.endswith('e'):
+            x += 1
+        elif direction.endswith('w'):
+            x -= 1
+        self.coordinates = (x, y)
+
+    def follow(self, l_directions):
+        # type: (list[str]) -> None
+        for direction in l_directions:
+            self.move(direction)
+
+    @property
+    def distance(self):
+        path_x = self.coordinates[0]
+        path_y = self.coordinates[1]
+        origin_x = self.origin[0]
+        origin_y = self.origin[1]
+        return abs(path_x - origin_x) + abs(path_y - origin_y)
+
+
+def parse_input(s_input):
+    # type: (str) -> list[str]
+    return [s.strip() for s in s_input.split(',')]
+
+
 def main():
     intext = common.read_input(11)
+    directions = parse_input(s_input=intext)
     log.info('Starting part 1...')
     answer_1 = 'Unknown'
     print('The answer to part 1 is: {}'.format(answer_1))
