@@ -13,7 +13,17 @@ SE = 'se'
 SW = 'sw'
 
 
-class HexGrid:
+class Traveler:
+    """    \ n  /
+        nw +--+ ne
+          /    \
+        -+      +- X
+          \    /
+        sw +--+ se
+          / s  \
+        Z       Y
+"""
+
     def __init__(self):
         self.origin = None  # type: tuple(int, int, int)
         self.coordinates = None  # type: tuple(int, int, int)
@@ -28,19 +38,24 @@ class HexGrid:
         # See http://keekerdc.com/wp-content/uploads/2011/03/HexGridLandscapeTriCoordinates.gif
         # N = y+, S = y-  and E = x+, W = x-
         x, y, z = self.coordinates
-        for d in list(direction):
-            if d == E:
-                x += 1
-                y -= 1
-            elif d == W:
-                x -= 1
-                y += 1
-            elif d == N:
-                y += 1
-                z -= 1
-            elif d == S:
-                y -= 1
-                z += 1
+        if direction == NE:
+            z -= 1
+            x += 1
+        elif direction == SW:
+            z += 1
+            x -= 1
+        elif direction == SE:
+            y -= 1
+            x += 1
+        elif direction == NW:
+            y += 1
+            x -= 1
+        elif direction == N:
+            y += 1
+            z -= 1
+        elif direction == S:
+            y -= 1
+            z += 1
 
         self.coordinates = (x, y, z)
 
@@ -57,15 +72,19 @@ class HexGrid:
     def distance_from_hex(self, h2):
         # http://keekerdc.com/2011/03/hexagon-grids-coordinate-systems-and-distance-calculations/
         x_1, y_1, z_1 = self.coordinates
-        x_2, y_2, z_2 = h2.origin
-        dist1 = abs(y_1 - y_2)
-        dist2 = abs(x_1 - x_2)
-        dist3 = abs(z_1 - z_2)
+        x_2, y_2, z_2 = (0, 0, 0)
+        if isinstance(h2, Traveler):
+            x_2, y_2, z_2 = h2.origin
+        elif isinstance(h2, tuple):
+            x_2, y_2, z_2 = h2
+        dist1 = abs(y_2 - y_1)
+        dist2 = abs(x_2 - x_1)
+        dist3 = abs(z_2 - z_1)
         hex_distance = max(dist1, dist2, dist3)
         return hex_distance
 
     def __repr__(self):
-        return "<HexGrid x={} y={} />".format(self.coordinates[0], self.coordinates[1])
+        return "<HexGrid (x, y, z)={}, distance={} />".format(self.coordinates, self.distance)
 
 
 def parse_input(s_input):
