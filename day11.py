@@ -27,11 +27,13 @@ class Traveler:
     def __init__(self):
         self.origin = None  # type: tuple(int, int, int)
         self.coordinates = None  # type: tuple(int, int, int)
+        self.max_distance = -1
         self.reset()
 
     def reset(self):
         self.origin = (0, 0, 0)  # x, y, z
         self.coordinates = self.origin
+        self.max_distance = -1
 
     def move(self, direction):
         # type: (str) -> None
@@ -58,6 +60,8 @@ class Traveler:
             z += 1
 
         self.coordinates = (x, y, z)
+        if self.max_distance < self.distance:
+            self.max_distance = self.distance
 
     def follow(self, l_directions):
         # type: (list[str]) -> None
@@ -95,12 +99,14 @@ def parse_input(s_input):
 def main():
     intext = common.read_input(11)
     directions = parse_input(s_input=intext)
+    t = Traveler()
+    t.follow(directions)
     log.info('Starting part 1...')
-    answer_1 = 'Unknown'
+    answer_1 = t.distance
     print('The answer to part 1 is: {}'.format(answer_1))
 
     log.info('Starting part 2...')
-    answer_2 = 'Unknown'
+    answer_2 = t.max_distance
     print('The answer to part 2 is: {}'.format(answer_2))
 
 
