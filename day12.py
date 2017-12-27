@@ -3,26 +3,29 @@ import common
 log = common.get_logger(__name__)
 
 
-class Program:
-    def __init__(self):
-        self._pid = -1
-        self._gid = -1
-        self._knows = set([])
+def program_generator(pid_relation):
+    programs = {}
+    for pid, k_pids in pid_relation:
+        links = programs.get(pid, set([]))
+        links = links.union(k_pids)
+        programs[pid] = links
+        for k_pid in k_pids:
+            k_links = programs.get(k_pid, set([]))
+            k_links.add(pid)
+            programs[k_pid] = k_links
+    return programs
 
 
-class PManager:
-    def __init__(self):
-        self._pids = set([])
+def knows(progs, p1, p2):
+    # type: (dict, int, int) -> bool
+    if p1 == p2:
+        return True
+    if p2 in progs[p1]:
+        return True
+    for p in [child for child in progs[p1] if child != p1]:
+        return knows(progs=progs, p1=p, p2=p2)
+    return False
 
-    def add_pid(self, pid):
-        self._pids.add(pid)
-
-    def knows(self, pid1, pid2):
-        talkers = set([])
-        while True:
-            talkers.union(pid1._knows)
-            break
-        return pid2 in talkers
 
 def parse_input(s_input):
     # type: (str) -> list[str]
@@ -35,14 +38,10 @@ def parse_input(s_input):
     return outs
 
 
-def program_generator(pid_relation):
-    for pid, knows in pid_relation:
-        p
-
-
 def main():
     intext = common.read_input(11)
     pid_relations = parse_input(s_input=intext)
+    programs = program_generator(pid_relations)
 
     log.info('Starting part 1...')
     answer_1 = 'Unknown'
