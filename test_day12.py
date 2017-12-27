@@ -31,8 +31,6 @@ class TestDay(unittest.TestCase):
         self.assertFalse(knows(progs, 1, 2))
         self.assertTrue(knows(progs, 0, 4))
 
-        num_links_zero = 0
-        for p in progs:
-            if knows(progs, p, 0):
-                num_links_zero += 1
-        self.assertEqual(6, num_links_zero)
+    def test_count(self):
+        progs = program_generator(parse_input(T_STR))
+        self.assertEqual(6, count_linking_to(progs, 0))
