@@ -16,15 +16,30 @@ def program_generator(pid_relation):
     return programs
 
 
-def knows(progs, p1, p2):
+def knows(progs, p1, p2, checked=None):
     # type: (dict, int, int) -> bool
-    if p1 == p2:
+    if checked == None:
+        checked = set([])
+    children = progs[p1].difference({p1})  # remove p from its own children
+    if p2 in children or \
+            p1 == p2:
         return True
-    if p2 in progs[p1]:
-        return True
-    for p in [child for child in progs[p1] if child != p1]:
-        return knows(progs=progs, p1=p, p2=p2)
+
+    for p in children:
+        if p not in checked:
+            checked.add(p)
+        else:
+            continue
+        return knows(progs=progs, p1=p, p2=p2, checked=checked)
     return False
+
+
+def count_linking_to(progs, p):
+    count = 0
+    for sub_p in progs:
+        if knows(progs, sub_p, p):
+            count += 1
+    return count
 
 
 def parse_input(s_input):
@@ -39,12 +54,13 @@ def parse_input(s_input):
 
 
 def main():
-    intext = common.read_input(11)
+    intext = common.read_input(12)
     pid_relations = parse_input(s_input=intext)
     programs = program_generator(pid_relations)
 
     log.info('Starting part 1...')
-    answer_1 = 'Unknown'
+    target = 0
+    answer_1 = count_linking_to(programs, target)
     print('The answer to part 1 is: {}'.format(answer_1))
 
     log.info('Starting part 2...')
