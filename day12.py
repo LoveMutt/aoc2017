@@ -50,7 +50,7 @@ def main():
     print('The answer to part 1 is: {}'.format(answer_1))
 
     log.info('Starting part 2...')
-    answer_2 = 'Unknown'
+    answer_2 = len(graph.findConnectedComponents())
     print('The answer to part 2 is: {}'.format(answer_2))
 
 
