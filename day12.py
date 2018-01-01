@@ -1,7 +1,6 @@
 import common
 
-from apgl.graph import GeneralVertexList, SparseGraph
-import numpy
+from apgl.graph import SparseGraph
 
 log = common.get_logger(__name__)
 
@@ -29,8 +28,9 @@ def links_to(graph, p):
 
 
 def parse_input(s_input):
-    # type: (str) -> list[str]
+    # type: (str) -> (list[str], int)
     outs = []
+    relations = 0
     for line in [l for l in s_input.split('\n') if l]:
         pid, knows = line.split('<->')
         pid = int(pid.strip())
