@@ -1,45 +1,31 @@
 import common
 
+from apgl.graph import GeneralVertexList, SparseGraph
+import numpy
+
 log = common.get_logger(__name__)
 
 
-def program_generator(pid_relation):
-    programs = {}
+def graph_generator(pid_relation, num_relations):
+    graph = SparseGraph(num_relations)
     for pid, k_pids in pid_relation:
-        links = programs.get(pid, set([]))
-        links = links.union(k_pids)
-        programs[pid] = links
         for k_pid in k_pids:
-            k_links = programs.get(k_pid, set([]))
-            k_links.add(pid)
-            programs[k_pid] = k_links
-    return programs
+            graph[pid, k_pid] = 1
+    return graph
 
 
-def knows(progs, p1, p2, checked=None):
-    # type: (dict, int, int) -> bool
-    if checked == None:
-        checked = set([])
-    children = progs[p1].difference({p1})  # remove p from its own children
-    if p2 in children or \
-            p1 == p2:
-        return True
-
-    for p in children:
-        if p not in checked:
-            checked.add(p)
-        else:
-            continue
-        return knows(progs=progs, p1=p, p2=p2, checked=checked)
+def knows(graph, p1, p2):
+    # type: (SparseGraph, int, int) -> bool
+    for relations in graph.findConnectedComponents():
+        if p1 in relations:
+            return p2 in relations
     return False
 
 
-def count_linking_to(progs, p):
-    count = 0
-    for sub_p in progs:
-        if knows(progs, sub_p, p):
-            count += 1
-    return count
+def links_to(graph, p):
+    # type: (SparseGraph, int) -> list[int]
+    group = [l for l in graph.findConnectedComponents() if p in l]
+    return group[0]
 
 
 def parse_input(s_input):
@@ -50,17 +36,17 @@ def parse_input(s_input):
         pid = int(pid.strip())
         knows = [int(pid.strip()) for pid in knows.split(',')]
         outs.append((pid, knows))
-    return outs
+        relations += 1
+    return outs, relations
 
 
 def main():
     intext = common.read_input(12)
-    pid_relations = parse_input(s_input=intext)
-    programs = program_generator(pid_relations)
+    pid_relations, num_relations = parse_input(s_input=intext)
+    graph = graph_generator(pid_relations, num_relations)
 
     log.info('Starting part 1...')
-    target = 0
-    answer_1 = count_linking_to(programs, target)
+    answer_1 = len(links_to(graph, 0))
     print('The answer to part 1 is: {}'.format(answer_1))
 
     log.info('Starting part 2...')
