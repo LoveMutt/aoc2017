@@ -42,11 +42,7 @@ class Layer:
 class Scanner:
     def __init__(self, layers):
         # type: (list[(int, int)]) -> None
-        self._layers = []
-        for idepth, irange in layers:
-            layer = Layer(idepth=idepth, irange=irange)
-            self._layers.append(layer)
-
+        self._layers = layers
         self._packet_pos = 0
         self._sec_value = 0
 
@@ -61,20 +57,28 @@ class Scanner:
 
     def step(self, step_size=1):
         log.info('Stepping size: {}...'.format(step_size))
+        layer = self._layers[self._packet_pos]  # type: Layer
+        if layer.start_depth == 0:
+            add_score = self.get_value(self._packet_pos)
+            log.warning('Detected!!!! Layer: {}. Adding score: {}'.format(self._packet_pos, add_score))
+            self._sec_value += add_score
+        log.debug('Stepping layers...')
         for l in self._layers:  # type: Layer
-            idx = self._layers.index(l)
-            if self._packet_pos == idx and l.start_depth == 0:
-                log.warning('Detected!!!! Layer: {}, Step: {}'.format(idx, self._packet_pos))
-                self._sec_value += self.get_value(idx)
-            log.debug('Stepping layer {}...'.format(idx))
             l.move(step_size=step_size)
 
         log.debug('Moving packet ahead...')
         self._packet_pos += step_size
 
+    def run(self):
+        for i in range(len(self._layers)):
+            self.step()
+
+    def __repr__(self):
+        return "<Scanner packet_pos: {}, pos_layer: {} />".format(self._packet_pos, self._layers[self._packet_pos])
+
 
 def parse_input(s_input):
-    # type: (str) -> (list[tuple])
+    # type: (str) -> (list[Layer])
     tmp = {}
     out = []
     log.info('Pre-processing input to get max layers...')
@@ -87,7 +91,7 @@ def parse_input(s_input):
             max_layer = layer
         tmp[layer] = irange
     log.info('Generating layers for scanner...')
-    for i in range(max_layer):
+    for i in range(max_layer + 1):
         irange = tmp.get(i, 0)
         log.debug('Creating Layer idx: {} with range: {}'.format(i, irange))
         layer = Layer(irange=irange)
@@ -98,13 +102,14 @@ def parse_input(s_input):
 def main():
     intext = common.read_input(12)
     layers = parse_input(s_input=intext)
-
+    s = Scanner(layers=layers)
+    s.run()
     log.info('Starting part 1...')
-    answer_1 = len(links_to(graph, 0))
+    answer_1 = s.score
     print('The answer to part 1 is: {}'.format(answer_1))
 
     log.info('Starting part 2...')
-    answer_2 = len(graph.findConnectedComponents())
+    answer_2 = 'Unknown'
     print('The answer to part 2 is: {}'.format(answer_2))
 
 
