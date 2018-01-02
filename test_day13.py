@@ -5,12 +5,23 @@ from common import get_logger
 
 log = get_logger(__name__)
 
+S_INPUT = '''0: 3
+1: 2
+4: 4
+6: 4'''
+
 
 class TestDay(unittest.TestCase):
     def setUp(self):
         self.t1 = (0, 3)
         self.t2 = (1, 2)
         self.t3 = (0, 4)
+
+    def test_parse(self):
+        inputs = parse_input(S_INPUT)
+        self.assertIsInstance(inputs, list)
+        for i in inputs:
+            self.assertIsInstance(i, Layer)
 
     def test_move(self):
         lyr = Layer(irange=3)
