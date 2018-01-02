@@ -20,6 +20,7 @@ class TestDay(unittest.TestCase):
     def test_parse(self):
         inputs = parse_input(S_INPUT)
         self.assertIsInstance(inputs, list)
+        self.assertEqual(7, len(inputs))
         for i in inputs:
             self.assertIsInstance(i, Layer)
 
