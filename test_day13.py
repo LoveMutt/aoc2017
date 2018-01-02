@@ -54,3 +54,9 @@ class TestDay(unittest.TestCase):
         self.assertEqual(0, s.score)
         s.step()
         self.assertEqual(2, s.score)
+
+    def test_run(self):
+        layers = parse_input(S_INPUT)
+        s = Scanner(layers=layers)
+        s.run()
+        self.assertEqual(24, s.score)
