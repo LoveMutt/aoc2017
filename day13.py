@@ -5,10 +5,13 @@ log = common.get_logger(__name__)
 
 class Layer:
     def __init__(self, idepth=0, irange=-1):
-        self._start_depth = idepth
+        self._start_depth = 0
         self._end_depth = self._start_depth + 1
         self._range = irange
         self._scalar = 1  # switches from 1 to -1
+        while idepth:
+            self.move()
+            idepth -= 1
 
     @property
     def start_depth(self):
@@ -18,9 +21,13 @@ class Layer:
     def end_depth(self):
         return self._end_depth
 
+    @property
+    def range(self):
+        return self._range
+
     def move(self, step_size=1):
         self._start_depth = self._end_depth
-        if (self._end_depth == self._range - 1) or (self._end_depth == 0):
+        if (self._start_depth == self._range - 1) or (self._start_depth == 0):
             self._scalar *= -1  # reverse direction of stepping
         end = self._end_depth + (step_size * self._scalar)
         self._end_depth = end
