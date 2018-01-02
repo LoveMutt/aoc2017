@@ -74,22 +74,30 @@ class Scanner:
 
 
 def parse_input(s_input):
-    # type: (str) -> (list[str], int)
-    outs = []
-    relations = 0
+    # type: (str) -> (list[tuple])
+    tmp = {}
+    out = []
+    log.info('Pre-processing input to get max layers...')
+    max_layer = -1
     for line in [l for l in s_input.split('\n') if l]:
-        pid, knows = line.split('<->')
-        pid = int(pid.strip())
-        knows = [int(pid.strip()) for pid in knows.split(',')]
-        outs.append((pid, knows))
-        relations += 1
-    return outs, relations
+        layer, irange = line.replace(' ', '').split(':')
+        layer = int(layer)
+        irange = int(irange)
+        if layer > max_layer:
+            max_layer = layer
+        tmp[layer] = irange
+    log.info('Generating layers for scanner...')
+    for i in range(max_layer):
+        irange = tmp.get(i, 0)
+        log.debug('Creating Layer idx: {} with range: {}'.format(i, irange))
+        layer = Layer(irange=irange)
+        out.append(layer)
+    return out
 
 
 def main():
     intext = common.read_input(12)
-    pid_relations, num_relations = parse_input(s_input=intext)
-    graph = graph_generator(pid_relations, num_relations)
+    layers = parse_input(s_input=intext)
 
     log.info('Starting part 1...')
     answer_1 = len(links_to(graph, 0))
