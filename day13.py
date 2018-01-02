@@ -12,6 +12,8 @@ class Layer:
         while idepth:
             self.move()
             idepth -= 1
+        if irange == -1:
+            self._start_depth = self._end_depth = -1  # this is a non-functional layer
 
     @property
     def start_depth(self):
@@ -26,11 +28,12 @@ class Layer:
         return self._range
 
     def move(self, step_size=1):
-        self._start_depth = self._end_depth
-        if (self._start_depth == self._range - 1) or (self._start_depth == 0):
-            self._scalar *= -1  # reverse direction of stepping
-        end = self._end_depth + (step_size * self._scalar)
-        self._end_depth = end
+        if self._range > 0:  # don't do any movement with range 0
+            self._start_depth = self._end_depth
+            if (self._start_depth == self._range - 1) or (self._start_depth == 0):
+                self._scalar *= -1  # reverse direction of stepping
+            end = self._end_depth + (step_size * self._scalar)
+            self._end_depth = end
 
     def __repr__(self):
         return "<Layer start: {}, end: {}, range: {} />".format(self.start_depth, self.end_depth, self.range)
