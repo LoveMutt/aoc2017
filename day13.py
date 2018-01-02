@@ -32,6 +32,43 @@ class Layer:
         end = self._end_depth + (step_size * self._scalar)
         self._end_depth = end
 
+    def __repr__(self):
+        return "<Layer start: {}, end: {}, range: {} />".format(self.start_depth, self.end_depth, self.range)
+
+
+class Scanner:
+    def __init__(self, layers):
+        # type: (list[(int, int)]) -> None
+        self._layers = []
+        for idepth, irange in layers:
+            layer = Layer(idepth=idepth, irange=irange)
+            self._layers.append(layer)
+
+        self._packet_pos = 0
+        self._sec_value = 0
+
+    @property
+    def score(self):
+        return self._sec_value
+
+    def get_value(self, layer_idx):
+        # type: (int) -> int
+        layer = self._layers[layer_idx]  # type: Layer
+        return layer.range * layer_idx
+
+    def step(self, step_size=1):
+        log.info('Stepping size: {}...'.format(step_size))
+        for l in self._layers:  # type: Layer
+            idx = self._layers.index(l)
+            if self._packet_pos == idx and l.start_depth == 0:
+                log.warning('Detected!!!! Layer: {}, Step: {}'.format(idx, self._packet_pos))
+                self._sec_value += self.get_value(idx)
+            log.debug('Stepping layer {}...'.format(idx))
+            l.move(step_size=step_size)
+
+        log.debug('Moving packet ahead...')
+        self._packet_pos += step_size
+
 
 def parse_input(s_input):
     # type: (str) -> (list[str], int)
