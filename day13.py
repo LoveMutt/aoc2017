@@ -100,7 +100,7 @@ def parse_input(s_input):
 
 
 def main():
-    intext = common.read_input(12)
+    intext = common.read_input(13)
     layers = parse_input(s_input=intext)
     s = Scanner(layers=layers)
     s.run()
@@ -114,5 +114,5 @@ def main():
 
 
 if __name__ == '__main__':
-    log = common.get_logger('day12', level='INFO')
+    log = common.get_logger('day13', level='INFO')
     main()
