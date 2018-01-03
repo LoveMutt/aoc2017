@@ -28,9 +28,9 @@ class Layer:
         return self._range
 
     def move(self, step_size=1):
-        if self._range > 0:  # don't do any movement with range 0
+        if self.range > 0:  # don't do any movement with range 0
             self._start_depth = self._end_depth
-            if (self._start_depth == self._range - 1) or (self._start_depth == 0):
+            if (self._start_depth == self.range - 1) or (self._start_depth == 0):
                 self._scalar *= -1  # reverse direction of stepping
             end = self._end_depth + (step_size * self._scalar)
             self._end_depth = end
@@ -40,11 +40,15 @@ class Layer:
 
 
 class Scanner:
-    def __init__(self, layers):
-        # type: (list[(int, int)]) -> None
+    def __init__(self, layers, delay=0):
+        # type: (list[Layer]) -> None
         self._layers = layers
         self._packet_pos = 0
         self._sec_value = 0
+        self._steps = 0
+        if delay:
+            for i in range(delay):
+                self.step_layers()
 
     @property
     def score(self):
@@ -55,16 +59,21 @@ class Scanner:
         layer = self._layers[layer_idx]  # type: Layer
         return layer.range * layer_idx
 
-    def step(self, step_size=1):
-        log.info('Stepping size: {}...'.format(step_size))
-        layer = self._layers[self._packet_pos]  # type: Layer
-        if layer.start_depth == 0:
-            add_score = self.get_value(self._packet_pos)
-            log.warning('Detected!!!! Layer: {}. Adding score: {}'.format(self._packet_pos, add_score))
-            self._sec_value += add_score
-        log.debug('Stepping layers...')
+    def step_layers(self, step_size=1):
         for l in self._layers:  # type: Layer
             l.move(step_size=step_size)
+        self._steps += 1
+
+    def step(self, step_size=1):
+        log.debug('Stepping size: {}...'.format(step_size))
+        layer = self._layers[self._packet_pos]  # type: Layer
+        if layer.start_depth == 0 and layer.range != 0:
+            add_score = self.get_value(self._packet_pos)
+            log.debug('Detected!!!! Layer: {}. Adding score: {}'.format(self._packet_pos, add_score))
+            self._sec_value += add_score
+
+        log.debug('Stepping layers...')
+        self.step_layers(step_size=step_size)
 
         log.debug('Moving packet ahead...')
         self._packet_pos += step_size
