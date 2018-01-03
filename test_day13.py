@@ -11,11 +11,19 @@ S_INPUT = '''0: 3
 6: 4'''
 
 
+def get_init_layers():
+    return parse_input(S_INPUT)
+
+
 class TestDay(unittest.TestCase):
     def setUp(self):
         self.t1 = (0, 3)
         self.t2 = (1, 2)
         self.t3 = (0, 4)
+
+        self.layer1 = Layer(idepth=self.t1[0], irange=self.t1[1])
+        self.layer2 = Layer(idepth=self.t2[0], irange=self.t2[1])
+        self.layer3 = Layer(idepth=self.t3[0], irange=self.t3[1])
 
     def test_parse(self):
         inputs = parse_input(S_INPUT)
@@ -48,7 +56,7 @@ class TestDay(unittest.TestCase):
         self.assertEqual(1, lyr.end_depth)
 
     def test_step(self):
-        s = Scanner(layers=[self.t1, self.t2])
+        s = Scanner(layers=[self.layer1, self.layer2])
         self.assertEqual(0, s.score)
         s.step()
         self.assertEqual(0, s.score)
@@ -60,3 +68,20 @@ class TestDay(unittest.TestCase):
         s = Scanner(layers=layers)
         s.run()
         self.assertEqual(24, s.score)
+
+    def test_delay(self):
+        delay = 0
+        s = Scanner(delay=delay, layers=get_init_layers())
+        s.run()
+        self.assertEqual(24, s.score)
+        delay = 1
+        s = Scanner(delay=delay, layers=get_init_layers())
+        layer = s._layers[0]  # type: Layer
+        self.assertEqual(1, layer.start_depth)
+        delay = 10
+        s = Scanner(delay=delay, layers=get_init_layers())
+        s.run()
+        self.assertEqual(0, s.score)
+        for i in [0, 1, 4, 6]:
+            self.assertEqual(1, s._layers[i].start_depth)
+        self.assertEqual(delay + len(s._layers), s._steps)
