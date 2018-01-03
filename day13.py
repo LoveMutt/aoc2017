@@ -46,9 +46,14 @@ class Scanner:
         self._packet_pos = 0
         self._sec_value = 0
         self._steps = 0
-        if delay:
-            for i in range(delay):
+        self._delay = delay
+        if self.delay:
+            for i in range(self.delay):
                 self.step_layers()
+
+    @property
+    def delay(self):
+        return self._delay
 
     @property
     def score(self):
@@ -69,7 +74,7 @@ class Scanner:
         layer = self._layers[self._packet_pos]  # type: Layer
         if layer.start_depth == 0 and layer.range != 0:
             add_score = self.get_value(self._packet_pos)
-            log.debug('Detected!!!! Layer: {}. Adding score: {}'.format(self._packet_pos, add_score))
+            log.info('Detected!!!! Layer: {}. Adding score: {}'.format(self._packet_pos, add_score))
             self._sec_value += add_score
 
         log.debug('Stepping layers...')
