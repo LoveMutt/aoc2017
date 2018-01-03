@@ -80,6 +80,10 @@ class TestDay(unittest.TestCase):
         self.assertEqual(1, layer.start_depth)
         delay = 10
         s = Scanner(delay=delay, layers=get_init_layers())
+        self.assertEqual(2, s._layers[0].start_depth)
+        self.assertEqual(0, s._layers[2].start_depth)
+        self.assertEqual(2, s._layers[4].start_depth)
+        self.assertEqual(2, s._layers[6].start_depth)
         s.run()
         self.assertEqual(0, s.score)
         for i in [0, 1, 4, 6]:
