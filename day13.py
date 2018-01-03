@@ -1,3 +1,4 @@
+import itertools
 import common
 
 log = common.get_logger(__name__)
@@ -74,7 +75,7 @@ class Scanner:
         layer = self._layers[self._packet_pos]  # type: Layer
         if layer.start_depth == 0 and layer.range != 0:
             add_score = self.get_value(self._packet_pos)
-            log.info('Detected!!!! Layer: {}. Adding score: {}'.format(self._packet_pos, add_score))
+            log.debug('Detected!!!! Layer: {}. Adding score: {}'.format(self._packet_pos, add_score))
             self._sec_value += add_score
 
         log.debug('Stepping layers...')
@@ -83,19 +84,39 @@ class Scanner:
         log.debug('Moving packet ahead...')
         self._packet_pos += step_size
 
-    def run(self):
+    def run(self, short_circuit=False):
         for i in range(len(self._layers)):
             self.step()
+            if short_circuit and self.score > 0:
+                log.debug('Aborting delay {} at layer {}'.format(self._delay, self._packet_pos))
+                break
 
     def __repr__(self):
         return "<Scanner packet_pos: {}, pos_layer: {} />".format(self._packet_pos, self._layers[self._packet_pos])
 
 
+def scanner(height, time):
+    offset = time % ((height - 1) * 2)
+
+    return 2 * (height - 1) - offset if offset > height - 1 else offset
+
+def part_2_stolen():
+    """ Straigh ganked from https://www.reddit.com/r/adventofcode/comments/7jgyrt/2017_day_13_solutions/dr6bxce/ """
+    lines = [line.split(': ') for line in common.read_input(13).split('\n')]
+
+    heights = {int(pos): int(height) for pos, height in lines}
+
+    part1 = sum(pos * heights[pos] for pos in heights if scanner(heights[pos], pos) == 0)
+    print('part1: {}'.format(part1))
+
+    part2 = next(
+        wait for wait in itertools.count() if not any(scanner(heights[pos], wait + pos) == 0 for pos in heights))
+    return part2
+
 def parse_input(s_input):
     # type: (str) -> (list[Layer])
     tmp = {}
     out = []
-    log.info('Pre-processing input to get max layers...')
     max_layer = -1
     for line in [l for l in s_input.split('\n') if l]:
         layer, irange = line.replace(' ', '').split(':')
@@ -104,11 +125,9 @@ def parse_input(s_input):
         if layer > max_layer:
             max_layer = layer
         tmp[layer] = irange
-    log.info('Generating layers for scanner...')
     for i in range(max_layer + 1):
         irange = tmp.get(i, 0)
-        log.debug('Creating Layer idx: {} with range: {}'.format(i, irange))
-        layer = Layer(irange=irange)
+        layer = Layer(idepth=0, irange=irange)
         out.append(layer)
     return out
 
@@ -123,16 +142,23 @@ def main():
     print('The answer to part 1 is: {}'.format(answer_1))
 
     log.info('Starting part 2...')
-    delay = 0
-    layers = parse_input(s_input=intext)
-    while True and delay < 10**4:
-        log.info('Trying delay: {}'.format(delay))
+    print('answer 2: {}'.format(part_2_stolen()))
+
+    delay = 5500
+    while False and delay < 10**4:
+        # log.info('Trying delay: {}'.format(delay))
+        layers = parse_input(s_input=intext)
+        if delay % 2 == 1:
+            delay += 1
+            continue  # only even delays allow layer 1 to pass
         s = Scanner(layers=layers, delay=delay)
-        s.run()
+        s.run(short_circuit=True)
         if s.score == 0:
             break
+        if delay % 500 == 0:
+            log.info('Delay: {}'.format(delay))
+        log.debug('Delay: {}, Score: {}'.format(delay, s.score))
         delay += 1
-        log.info('Delay: {}, Score: {}'.format(delay, s.score))
     answer_2 = delay
     print('The answer to part 2 is: {}'.format(answer_2))
 
