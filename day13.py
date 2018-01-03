@@ -118,7 +118,17 @@ def main():
     print('The answer to part 1 is: {}'.format(answer_1))
 
     log.info('Starting part 2...')
-    answer_2 = 'Unknown'
+    delay = 0
+    layers = parse_input(s_input=intext)
+    while True and delay < 10**4:
+        log.info('Trying delay: {}'.format(delay))
+        s = Scanner(layers=layers, delay=delay)
+        s.run()
+        if s.score == 0:
+            break
+        delay += 1
+        log.info('Delay: {}, Score: {}'.format(delay, s.score))
+    answer_2 = delay
     print('The answer to part 2 is: {}'.format(answer_2))
 
 
